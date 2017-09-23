@@ -20,11 +20,6 @@ public abstract class Animator implements ActionListener {
         return ret;
     }
 
-    // Gaussian function with peak 'height' and variance 'var'
-    private double Gaussian(double x, double height, double var){
-        return height * Math.exp(-(x*x) / (2 * var));
-    }
-
     // Returns speed given relative distance
     // Relative distance contains a value between [0 and 1]
     private double speed(double relative_distance){
@@ -32,7 +27,13 @@ public abstract class Animator implements ActionListener {
         double normalized_x = relative_distance - 0.5;
 
         // Return Gaussian to ease
-        return Gaussian(normalized_x, 10, 0.1);
+        // Max velocity based on initialDistance, so the movement lasts exactly the same for every distance
+        return Gaussian(normalized_x, initialDistance / 20, 0.1);
+    }
+
+    // Gaussian function with peak 'height' and variance 'var'
+    private double Gaussian(double x, double height, double var){
+        return height * Math.exp(-(x*x) / (2 * var));
     }
 
     public abstract void actionPerformed(ActionEvent e);

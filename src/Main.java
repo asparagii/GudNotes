@@ -53,8 +53,18 @@ class View extends JPanel implements MouseWheelListener{
         // ctrl + shift + n => append node
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "appendNode");
 
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "changeCursorLeft");
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "changeCursorRight");
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "changeCursorUp");
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "changeCursorDown");
+
         getActionMap().put("appendNodeAndMove", appendNodeAndMove);
         getActionMap().put("appendNode", appendNode);
+        getActionMap().put("changeCursorLeft", changeCursorLeft);
+        getActionMap().put("changeCursorRight", changeCursorRight);
+        getActionMap().put("changeCursorUp", changeCursorUp);
+        getActionMap().put("changeCursorDown", changeCursorDown);
+
     }
 
 
@@ -72,6 +82,34 @@ class View extends JPanel implements MouseWheelListener{
         public void actionPerformed(ActionEvent e) {
             appendNode("new", false);
             repaint();
+        }
+    };
+
+    private Action changeCursorLeft = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            cursorToParent();
+        }
+    };
+
+    private Action changeCursorRight = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            cursorToChild();
+        }
+    };
+
+    private Action changeCursorUp = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            navigateBrother(-1);
+        }
+    };
+
+    private Action changeCursorDown = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            navigateBrother(1);
         }
     };
 
@@ -98,7 +136,7 @@ class View extends JPanel implements MouseWheelListener{
     // Appends a node to the current selected node (indexed by cursor)
     // title: label of the next node
     // move: if true, new node will be selected
-    public void appendNode(String title, boolean move){
+    private void appendNode(String title, boolean move){
         GraphicNode new_entry = new GraphicNode(title, 80, 100);
 
         new_entry.addParent(nodes.get(cursor));
@@ -108,7 +146,6 @@ class View extends JPanel implements MouseWheelListener{
 
         nodes.add(new_entry);
 
-
         // If 'move' is true, move the cursor to the new node
         if(move) {
             moveCameraSmooth(new_entry);
@@ -117,9 +154,52 @@ class View extends JPanel implements MouseWheelListener{
         }
     }
 
+    // Moves cursor to the (first) parent of the current node
+    private void cursorToParent(){
+        try {
+            cursor = nodes.indexOf((GraphicNode) selectedNode().getParents().get(0));
+        } catch(IndexOutOfBoundsException e){
+            return;
+        }
+        moveCameraSmooth(selectedNode());
+    }
+
+    // Moves cursor to the first child of the current node
+    private void cursorToChild(){
+        try {
+            cursor = nodes.indexOf((GraphicNode) selectedNode().getChildren().get(0));
+        } catch(IndexOutOfBoundsException e){
+            return;
+        }
+        moveCameraSmooth(selectedNode());
+    }
+
+    private void navigateBrother(int offset){
+
+        GraphicNode parent;
+        try {
+            parent = (GraphicNode) selectedNode().getParents().get(0);
+        } catch (IndexOutOfBoundsException e){
+            return;
+        }
+        // index of the current node in the parent's children array
+        int index_of_current = parent.getChildren().indexOf(selectedNode());
+
+        // if this is NOT the first child and we are NOT moving up
+        if(index_of_current + offset > -1){
+            System.out.println(index_of_current);
+
+            try {
+                cursor = nodes.indexOf((GraphicNode) parent.getChildren().get(index_of_current + offset));
+            } catch(IndexOutOfBoundsException e){
+                return;
+            }
+        }
+        moveCameraSmooth(selectedNode());
+    }
 
     // Move camera smoothly using moving law defined in Animator
-    Timer animation_timer = null;
+    private Timer animation_timer = null;
     private void moveCameraSmooth(GraphicNode n) {
         // If there is already a timer running, then stop timer
         if(animation_timer != null && animation_timer.isRunning())
@@ -142,7 +222,7 @@ class View extends JPanel implements MouseWheelListener{
         animation_timer.start();
     }
 
-    GraphicNode selectedNode(){
+    private GraphicNode selectedNode(){
         return nodes.get(cursor);
     }
 
