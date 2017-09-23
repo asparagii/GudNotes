@@ -61,5 +61,12 @@ public class GraphicNode extends Node{
         g.setColor(Color.BLACK);
         g.drawRect((int) rel_pos.x(), (int) rel_pos.y(), (int) size.x(), (int) size.y());
         g.drawString(title, (int) rel_pos.x(), (int) rel_pos.y() - 5);
+
+        for (Object i : getChildren()) {
+            GraphicNode tmp = (GraphicNode) i;
+
+            Vector2 start_line = rel_pos.add(new Vector2(size.x(), 10));
+            g.drawLine((int) start_line.x(), (int) start_line.y(), (int) tmp.relativePosition(camera).x(), (int) tmp.relativePosition(camera).y());
+        }
     }
 }

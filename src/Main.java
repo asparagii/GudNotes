@@ -187,8 +187,6 @@ class View extends JPanel implements MouseWheelListener{
 
         // if this is NOT the first child and we are NOT moving up
         if(index_of_current + offset > -1){
-            System.out.println(index_of_current);
-
             try {
                 cursor = nodes.indexOf((GraphicNode) parent.getChildren().get(index_of_current + offset));
             } catch(IndexOutOfBoundsException e){
