@@ -109,21 +109,10 @@ class View extends JPanel{
         }
     }
 
-    // returns the node currently pointed by cursor
-    GraphicNode selectedNode(){
-        return nodes.get(cursor);
-    }
-
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-
-        Graphics2D g2 = (Graphics2D) g;
-
-        // Zoom
-        g2.scale(camera.getZoom(), camera.getZoom());
-
         for(GraphicNode e : nodes){
-            e.paintNode(camera, g2, selectedNode() == e);
+            e.paintNode(camera, g);
         }
     }
 }
