@@ -83,8 +83,7 @@ class View extends JPanel implements MouseWheelListener{
             } else {
                 camera.addZoom(-0.1);
             }
-            // recalculate offset
-            camera.lookAt(selectedNode());
+
             repaint();
         }
     }
@@ -127,7 +126,7 @@ class View extends JPanel implements MouseWheelListener{
             animation_timer.stop();
 
         // Create a new timer with Animator ActionListener
-        animation_timer = new Timer(16, new Animator(camera.lookAt(n)) {
+        animation_timer = new Timer(16, new Animator(camera.getPosition(), camera.lookAt(n)) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Move using step function in Animator
