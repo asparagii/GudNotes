@@ -1,5 +1,6 @@
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.*;
 import java.util.ArrayList;
 
@@ -39,7 +40,7 @@ class View extends JPanel implements MouseWheelListener{
         cursor = 0;
 
         camera = new Camera(0, 0, 1);
-        camera.lookAt(root);
+        camera.setPosition(camera.lookAt(root));
 
 
         // Zoom with ctrl + mouseWheel
@@ -51,12 +52,9 @@ class View extends JPanel implements MouseWheelListener{
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), "appendNodeAndMove");
         // ctrl + shift + n => append node
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "appendNode");
-        // z => set zoom to 2.0x
-        getInputMap().put(KeyStroke.getKeyStroke('z'), "changeZoom");
 
         getActionMap().put("appendNodeAndMove", appendNodeAndMove);
         getActionMap().put("appendNode", appendNode);
-
     }
 
 
@@ -111,11 +109,34 @@ class View extends JPanel implements MouseWheelListener{
 
         nodes.add(new_entry);
 
+
         // If 'move' is true, move the cursor to the new node
         if(move) {
+            moveCameraSmooth(new_entry);
             cursor = nodes.indexOf(new_entry);
-            camera.lookAt(new_entry);
+            repaint();
         }
+    }
+
+    private void moveCameraSmooth(GraphicNode n) {
+
+        // TODO Prevent simultaneous Animator to start
+        // When multiple nodes are created rapidly, animations are running simultaneously
+
+        Timer timer = new Timer(16, new Animator(camera.lookAt(n)) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                camera.move(step(camera.getPosition()));
+                repaint();
+
+                // When final_position is reached (with 1px error) stop moving
+                if(camera.getPosition().subtract(this.final_position).getMagnitude() < 1){
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        timer.start();
+
     }
 
     GraphicNode selectedNode(){

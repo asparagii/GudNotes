@@ -1,26 +1,28 @@
-import javax.swing.*;
-
 // This class provides a basic camera
 public class Camera {
-    private int[] position;
+    private Vector2 position;
     private float zoom;
 
     public Camera(int x, int y, float startZoom){
-        position = new int[] {x, y};
+        position = new Vector2(x, y);
         zoom = startZoom;
     }
 
 
     // Set camera position to global coordinates (x, y)
-    public void setPosition(int x, int y){
-        position[0] = x;
-        position[1] = y;
+    public void setPosition(Vector2 pos){
+        position = pos;
     }
 
-    // Set camera position so that n is in relative coordinates (400, 200) / zoom
-    void lookAt(GraphicNode n){
-        int[] to_look = n.getPosition();
-        setPosition(to_look[0] - (int) (400 / zoom), to_look[1] - (int) (200 / zoom));
+    // Returns position that camera should assume to have node n in relative coordinates (400, 200) / zoom
+    Vector2 lookAt(GraphicNode n){
+        Vector2 offset = new Vector2(400 / zoom, 200 / zoom);
+        Vector2 to_look = n.getPosition();
+        return to_look.subtract(offset);
+    }
+
+    void move(Vector2 speed){
+        position = position.add(speed);
     }
 
     public void setZoom(float z){
@@ -32,7 +34,7 @@ public class Camera {
 
     public float getZoom(){ return zoom; }
 
-    public int[] getPosition(){
+    public Vector2 getPosition(){
         return position;
     }
 }

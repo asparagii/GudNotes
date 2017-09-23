@@ -3,14 +3,14 @@ import java.awt.*;
 public class GraphicNode extends Node{
 
     private String title;
-    private int[] size;
-    private int[] position;
+    private Vector2 size;
+    private Vector2 position;
 
     public GraphicNode(String title, int height, int width){
         super();
         this.title = title;
-        position = new int[2];
-        size = new int[] {width, height};
+        position = new Vector2(0, 0);
+        size = new Vector2(width, height);
     }
 
 
@@ -18,39 +18,35 @@ public class GraphicNode extends Node{
     // To be called only when node has one parent
     public void setAutoPosition(int minSpace){
         try {
-            GraphicNode tmp = (GraphicNode) getParents().get(0);
-            position[0] = tmp.getPosition()[0] + tmp.getSize()[0] + minSpace;
+            GraphicNode father = (GraphicNode) getParents().get(0);
+            position.setX(father.getPosition().x() + father.getSize().x() + minSpace);
 
             int sum = 0;
-            for (Object i : tmp.getChildren()) {
+            for (Object i : father.getChildren()) {
                 GraphicNode e = (GraphicNode) i;
-                sum += e.getSize()[1] + minSpace;
+                sum += e.getSize().y() + minSpace;
             }
-            position[1] = tmp.getPosition()[1] + sum - getSize()[1] - minSpace;
+            position.setY(father.getPosition().y() + sum - getSize().y() - minSpace);
 
         } catch (ArrayIndexOutOfBoundsException e){
-            position[0] = 0;
-            position[1] = 0;
+            position.setPosition(0, 0);
         }
     }
 
     public void setPosition(int x, int y){
-        position[0] = x;
-        position[1] = y;
+        position.setPosition(x, y);
     }
 
-    public int[] getPosition(){
+    public Vector2 getPosition(){
         return position;
     }
 
-    public int[] getSize(){
+    public Vector2 getSize(){
         return size;
     }
 
-    private int[] relativePosition(Camera camera){
-        int t_x = position[0] - camera.getPosition()[0];
-        int t_y = position[1] - camera.getPosition()[1];
-        return new int[] {t_x, t_y};
+    private Vector2 relativePosition(Camera camera){
+        return position.subtract(camera.getPosition());
     }
 
     void paintNode(Camera camera, Graphics2D g, boolean highlight){
@@ -61,9 +57,9 @@ public class GraphicNode extends Node{
             g.setStroke(new BasicStroke(1));
         }
 
-        int[] rel_pos = relativePosition(camera);
+        Vector2 rel_pos = relativePosition(camera);
         g.setColor(Color.BLACK);
-        g.drawRect(rel_pos[0], rel_pos[1], size[0], size[1]);
-        g.drawString(title, rel_pos[0], rel_pos[1] - 5);
+        g.drawRect((int) rel_pos.x(), (int) rel_pos.y(), (int) size.x(), (int) size.y());
+        g.drawString(title, (int) rel_pos.x(), (int) rel_pos.y() - 5);
     }
 }
