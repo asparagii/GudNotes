@@ -109,10 +109,19 @@ class View extends JPanel{
         }
     }
 
+    GraphicNode selectedNode(){
+        return nodes.get(cursor);
+    }
+
     public void paintComponent(Graphics g){
         super.paintComponent(g);
+
+        Graphics2D g2 = (Graphics2D) g;
+        g2.scale(camera.getZoom(), camera.getZoom());
+
         for(GraphicNode e : nodes){
-            e.paintNode(camera, g);
+            // if e is selected, highlight
+            e.paintNode(camera, g2, selectedNode() == e);
         }
     }
 }

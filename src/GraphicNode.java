@@ -53,7 +53,14 @@ public class GraphicNode extends Node{
         return new int[] {t_x, t_y};
     }
 
-    void paintNode(Camera camera, Graphics g){
+    void paintNode(Camera camera, Graphics2D g, boolean highlight){
+        // If highlight is true node will be painted with strokeWeight 2
+        if(highlight){
+            g.setStroke(new BasicStroke(2));
+        } else {
+            g.setStroke(new BasicStroke(1));
+        }
+
         int[] rel_pos = relativePosition(camera);
         g.setColor(Color.BLACK);
         g.drawRect(rel_pos[0], rel_pos[1], size[0], size[1]);
