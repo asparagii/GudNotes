@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 // This class provides a basic camera
 public class Camera {
     private int[] position;
@@ -24,6 +26,9 @@ public class Camera {
     public void setZoom(float z){
         zoom = z;
     }
+
+    // Add to_add to zoom
+    public void addZoom(double to_add){ zoom += to_add; }
 
     public float getZoom(){ return zoom; }
 

@@ -1,13 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args){
-
         View view = new View();
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -18,21 +15,17 @@ public class Main {
         });
     }
 
-
-
     private static void GUI(View view){
         JFrame frame = new JFrame("Appunti");
         frame.setSize(1280, 720);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-
 
         frame.add(view);
         frame.setVisible(true);
     }
 }
 
-class View extends JPanel{
+class View extends JPanel implements MouseWheelListener{
     private ArrayList<GraphicNode> nodes;
     private Camera camera;
     private int cursor;
@@ -49,17 +42,20 @@ class View extends JPanel{
         camera.lookAt(root);
 
 
+        // Zoom with ctrl + mouseWheel
+        addMouseWheelListener(this);
+
         // --- Set input map ---
         //
         // ctrl + n => append node and move cursor
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), "appendNodeAndMove");
         // ctrl + shift + n => append node
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "appendNode");
-
+        // z => set zoom to 2.0x
+        getInputMap().put(KeyStroke.getKeyStroke('z'), "changeZoom");
 
         getActionMap().put("appendNodeAndMove", appendNodeAndMove);
         getActionMap().put("appendNode", appendNode);
-
 
     }
 
@@ -81,6 +77,19 @@ class View extends JPanel{
         }
     };
 
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if(e.isControlDown()){
+            if(e.getWheelRotation() < 0) {
+                camera.addZoom(0.1);
+            } else {
+                camera.addZoom(-0.1);
+            }
+            // recalculate offset
+            camera.lookAt(selectedNode());
+            repaint();
+        }
+    }
 
 
     // Necessary to have focus for input events
@@ -124,4 +133,5 @@ class View extends JPanel{
             e.paintNode(camera, g2, selectedNode() == e);
         }
     }
+
 }
