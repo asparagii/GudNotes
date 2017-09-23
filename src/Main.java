@@ -1,6 +1,5 @@
 import javax.swing.*;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
@@ -228,6 +227,11 @@ class View extends JPanel implements MouseWheelListener{
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
+
+        // Antialiasing
+        RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHints(rh);
+
         g2.scale(camera.getZoom(), camera.getZoom());
 
         for(GraphicNode e : nodes){

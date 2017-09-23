@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.geom.CubicCurve2D;
 
 public class GraphicNode extends Node{
 
@@ -66,7 +67,20 @@ public class GraphicNode extends Node{
             GraphicNode tmp = (GraphicNode) i;
 
             Vector2 start_line = rel_pos.add(new Vector2(size.x(), 10));
-            g.drawLine((int) start_line.x(), (int) start_line.y(), (int) tmp.relativePosition(camera).x(), (int) tmp.relativePosition(camera).y());
+            Vector2 end_line = tmp.relativePosition(camera);
+            paintArc(g, start_line, end_line);
         }
+    }
+
+    void paintArc(Graphics2D g, Vector2 start, Vector2 end){
+        // control = start + (end - start) / 2
+        Vector2 control = start.add(end.subtract(start).multiply(0.5));
+
+        CubicCurve2D.Double arc = new CubicCurve2D.Double(start.x(), start.y(),
+                control.x(), start.y(),
+                control.x(), end.y(),
+                end.x(), end.y());
+        g.draw(arc);
+
     }
 }
