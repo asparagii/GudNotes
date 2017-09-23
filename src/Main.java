@@ -118,25 +118,29 @@ class View extends JPanel implements MouseWheelListener{
         }
     }
 
+
+    // Move camera smoothly using moving law defined in Animator
+    Timer animation_timer = null;
     private void moveCameraSmooth(GraphicNode n) {
+        // If there is already a timer running, then stop timer
+        if(animation_timer != null && animation_timer.isRunning())
+            animation_timer.stop();
 
-        // TODO Prevent simultaneous Animator to start
-        // When multiple nodes are created rapidly, animations are running simultaneously
-
-        Timer timer = new Timer(16, new Animator(camera.lookAt(n)) {
+        // Create a new timer with Animator ActionListener
+        animation_timer = new Timer(16, new Animator(camera.lookAt(n)) {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Move using step function in Animator
                 camera.move(step(camera.getPosition()));
                 repaint();
 
-                // When final_position is reached (with 1px error) stop moving
-                if(camera.getPosition().subtract(this.final_position).getMagnitude() < 1){
+                // When final_position is reached (with 5px error) stop moving
+                if(camera.getPosition().subtract(this.final_position).getMagnitude() < 5){
                     ((Timer) e.getSource()).stop();
                 }
             }
         });
-        timer.start();
-
+        animation_timer.start();
     }
 
     GraphicNode selectedNode(){
