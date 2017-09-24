@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.CubicCurve2D;
 
@@ -6,12 +7,15 @@ public class GraphicNode extends Node{
     private String title;
     private Vector2 size;
     private Vector2 position;
+    private NodeContent content;
 
-    public GraphicNode(String title, int height, int width){
+    GraphicNode(String title, int height, int width){
         super();
         this.title = title;
         position = new Vector2(0, 0);
         size = new Vector2(width, height);
+
+        content = new NodeContent(width, height);
     }
 
 
@@ -34,15 +38,15 @@ public class GraphicNode extends Node{
         }
     }
 
-    public void setPosition(int x, int y){
+    void setPosition(int x, int y){
         position.setPosition(x, y);
     }
 
-    public Vector2 getPosition(){
+    Vector2 getPosition(){
         return position;
     }
 
-    public Vector2 getSize(){
+    Vector2 getSize(){
         return size;
     }
 
@@ -63,6 +67,8 @@ public class GraphicNode extends Node{
         g.drawRect((int) rel_pos.x(), (int) rel_pos.y(), (int) size.x(), (int) size.y());
         g.drawString(title, (int) rel_pos.x(), (int) rel_pos.y() - 5);
 
+        content.print(g, rel_pos);
+
         for (Object i : getChildren()) {
             GraphicNode tmp = (GraphicNode) i;
 
@@ -72,7 +78,12 @@ public class GraphicNode extends Node{
         }
     }
 
-    void paintArc(Graphics2D g, Vector2 start, Vector2 end){
+    void appendChar(char s){
+        content.addChar(s);
+    }
+
+
+    private void paintArc(Graphics2D g, Vector2 start, Vector2 end){
         // control = start + (end - start) / 2
         Vector2 control = start.add(end.subtract(start).multiply(0.5));
 
@@ -80,6 +91,7 @@ public class GraphicNode extends Node{
                 control.x(), start.y(),
                 control.x(), end.y(),
                 end.x(), end.y());
+
         g.draw(arc);
 
     }

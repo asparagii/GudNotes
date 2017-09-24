@@ -5,7 +5,6 @@ import java.util.List;
 // Basic node class
 
 public class Node {
-    private String content;
     private List<Node> parents;
     private List<Node> children;
 
@@ -20,10 +19,6 @@ public class Node {
 
     void addParent(Node n){
         parents.add(n);
-    }
-
-    public void appendContent(String to_add){
-        content = content.concat(to_add);
     }
 
     List getChildren(){

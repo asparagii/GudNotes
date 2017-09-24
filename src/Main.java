@@ -25,7 +25,7 @@ public class Main {
     }
 }
 
-class View extends JPanel implements MouseWheelListener{
+class View extends JPanel implements MouseWheelListener, KeyListener{
     private ArrayList<GraphicNode> nodes;
     private Camera camera;
     private int cursor;
@@ -42,6 +42,8 @@ class View extends JPanel implements MouseWheelListener{
         camera.setPosition(camera.lookAt(root));
 
 
+        addKeyListener(this);
+
         // Zoom with ctrl + mouseWheel
         addMouseWheelListener(this);
 
@@ -51,7 +53,7 @@ class View extends JPanel implements MouseWheelListener{
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), "appendNodeAndMove");
         // ctrl + shift + n => append node
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "appendNode");
-
+        // ctrl + alt + arrow keys => navigate nodes
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "changeCursorLeft");
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "changeCursorRight");
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "changeCursorUp");
@@ -240,4 +242,19 @@ class View extends JPanel implements MouseWheelListener{
         }
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {
+        selectedNode().appendChar(e.getKeyChar());
+        repaint();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
 }
