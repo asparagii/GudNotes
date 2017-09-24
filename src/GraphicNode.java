@@ -1,6 +1,4 @@
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.geom.CubicCurve2D;
 
 public class GraphicNode extends Node{
@@ -101,6 +99,7 @@ public class GraphicNode extends Node{
         content.addChar(s);
     }
 
+    void moveCursor(int m){ content.moveCursor(m); }
 
     private void paintArc(Graphics2D g, Vector2 start, Vector2 end){
         // control = start + (end - start) / 2

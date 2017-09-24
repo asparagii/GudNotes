@@ -1,4 +1,4 @@
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.ArrayList;
 
 class NodeContent {
@@ -8,6 +8,12 @@ class NodeContent {
     private int cursor;
     private int line_cursor;
     private int border_size;
+
+    static final public int LEFT = 0;
+    static final public int RIGHT = 1;
+    static final public int END = 4;
+    static final public int START = 5;
+
 
     NodeContent(double width, double height, int border_size){
         size = new Vector2(width, height);
@@ -26,11 +32,35 @@ class NodeContent {
                 block != Character.UnicodeBlock.SPECIALS;
     }
 
-    private void newLine(){
+    // 'bring' will be the content of the new line
+    private void newLine(String bring){
             text.add("");
             text_buffer.delete(0, text_buffer.length());
+            text_buffer.insert(0, bring);
             cursor = 0;
             line_cursor++;
+    }
+
+    void moveCursor(int m){
+        switch(m){
+            case RIGHT:
+                if(cursor < text_buffer.length())
+                    cursor++;
+                break;
+
+            case LEFT:
+                if(cursor > 0)
+                    cursor--;
+                break;
+
+            case END:
+                cursor = text_buffer.length();
+                break;
+
+            case START:
+                cursor = 0;
+                break;
+        }
     }
 
     void addChar(char c){
@@ -42,11 +72,13 @@ class NodeContent {
 
         // New line
         if(c == '\n'){
-            newLine();
+            String to_bring = text_buffer.substring(cursor);
+            text.set(line_cursor, text.get(line_cursor).substring(0, cursor));
+            newLine(to_bring);
         }
 
         if(isPrintableChar(c)) {
-            text_buffer.append(c);
+            text_buffer.insert(cursor, c);
             cursor++;
         }
         text.set(line_cursor, text_buffer.toString());
@@ -56,14 +88,22 @@ class NodeContent {
         size = new_size;
     }
 
+    private void drawCursor(Graphics2D g, Vector2 position){
+        g.setStroke(new BasicStroke(1));
+        Vector2 cursor_position = position.add(new Vector2(border_size + g.getFontMetrics().stringWidth(text_buffer.substring(0, cursor)), 3 + line_cursor * g.getFontMetrics().getHeight()));
+        g.drawLine((int) cursor_position.x(), (int) cursor_position.y(), (int) cursor_position.x(), (int) cursor_position.y() + g.getFontMetrics().getHeight());
+    }
+
     boolean print(Graphics2D g, Vector2 position){
         if(text != null) {
             int i = 0;
 
+            drawCursor(g, position);
 
             for(String line : text) {
+                // If resize is needed
                 if(g.getFontMetrics().stringWidth(line) > (size.x() - border_size)){
-                    System.out.println(size.x() + " , " + size.y());
+                    // Return true (will trigger resize and redraw)
                     return true;
                 }
                 g.drawString(line, (int) position.x() + border_size, (int) position.y() + g.getFontMetrics().getHeight() * (i + 1));
