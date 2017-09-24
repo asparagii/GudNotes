@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.geom.CubicCurve2D;
 
 public class GraphicNode extends Node{
@@ -15,7 +16,7 @@ public class GraphicNode extends Node{
         position = new Vector2(0, 0);
         size = new Vector2(width, height);
 
-        content = new NodeContent(width, height);
+        content = new NodeContent(width, height, 5);
     }
 
 
@@ -38,6 +39,15 @@ public class GraphicNode extends Node{
         }
     }
 
+    // Set automatic position for every child and grandchild and (...)
+    public void setAutoPositionFamily(int minSpace){
+        for (Object i : getChildren()) {
+            GraphicNode to_be_changed = (GraphicNode) i;
+            to_be_changed.setAutoPositionFamily(minSpace);
+            to_be_changed.setAutoPosition(minSpace);
+        }
+    }
+
     void setPosition(int x, int y){
         position.setPosition(x, y);
     }
@@ -54,7 +64,8 @@ public class GraphicNode extends Node{
         return position.subtract(camera.getPosition());
     }
 
-    void paintNode(Camera camera, Graphics2D g, boolean highlight){
+    // If returns true, need repaint
+    boolean paintNode(Camera camera, Graphics2D g, boolean highlight){
         // If highlight is true node will be painted with strokeWeight 2
         if(highlight){
             g.setStroke(new BasicStroke(2));
@@ -67,7 +78,14 @@ public class GraphicNode extends Node{
         g.drawRect((int) rel_pos.x(), (int) rel_pos.y(), (int) size.x(), (int) size.y());
         g.drawString(title, (int) rel_pos.x(), (int) rel_pos.y() - 5);
 
-        content.print(g, rel_pos);
+        // Border size sets margins to draw text
+        // If size exceeds, resize
+        if(content.print(g, rel_pos)){
+            size = size.add(new Vector2(4, 0));
+            content.setSize(size);
+            setAutoPositionFamily(20);
+            return true;
+        }
 
         for (Object i : getChildren()) {
             GraphicNode tmp = (GraphicNode) i;
@@ -76,6 +94,7 @@ public class GraphicNode extends Node{
             Vector2 end_line = tmp.relativePosition(camera);
             paintArc(g, start_line, end_line);
         }
+        return false;
     }
 
     void appendChar(char s){

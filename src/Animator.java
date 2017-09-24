@@ -28,7 +28,7 @@ public abstract class Animator implements ActionListener {
 
         // Return Gaussian to ease
         // Max velocity based on initialDistance, so the movement lasts exactly the same for every distance
-        return Gaussian(normalized_x, initialDistance / 20, 0.1);
+        return Gaussian(normalized_x, initialDistance / 10, 0.1);
     }
 
     // Gaussian function with peak 'height' and variance 'var'

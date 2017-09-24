@@ -237,8 +237,11 @@ class View extends JPanel implements MouseWheelListener, KeyListener{
         g2.scale(camera.getZoom(), camera.getZoom());
 
         for(GraphicNode e : nodes){
+            // if paintNode returns true, repaint() needed
             // if e is selected, highlight
-            e.paintNode(camera, g2, selectedNode() == e);
+            if(e.paintNode(camera, g2, selectedNode() == e)){
+                repaint();
+            }
         }
     }
 
