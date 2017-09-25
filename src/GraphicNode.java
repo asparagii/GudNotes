@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.geom.CubicCurve2D;
+import java.util.concurrent.Callable;
 
 public class GraphicNode extends Node{
 
@@ -63,7 +64,7 @@ public class GraphicNode extends Node{
     }
 
     // If returns true, need repaint
-    boolean paintNode(Camera camera, Graphics2D g, boolean highlight){
+    boolean paintNode(Camera camera, Graphics2D g, boolean highlight, Callable everyFrame){
         // If highlight is true node will be painted with strokeWeight 2
         if(highlight){
             g.setStroke(new BasicStroke(2));
@@ -77,12 +78,10 @@ public class GraphicNode extends Node{
         g.drawString(title, (int) rel_pos.x(), (int) rel_pos.y() - 5);
 
         // Border size sets margins to draw text
-        // If size exceeds, resize
-        if(content.print(g, rel_pos)){
-            size = size.add(new Vector2(4, 0));
-            content.setSize(size);
+        // If content is resizing, resize accordingly
+        if(content.print(g, rel_pos, everyFrame)){
+            size = content.getSize();
             setAutoPositionFamily(20);
-            return true;
         }
 
         for (Object i : getChildren()) {

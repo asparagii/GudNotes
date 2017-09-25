@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 public class View extends JPanel implements MouseWheelListener, KeyListener{
     private ArrayList<GraphicNode> nodes;
@@ -178,28 +179,15 @@ public class View extends JPanel implements MouseWheelListener, KeyListener{
         moveCameraSmooth(selectedNode());
     }
 
+    public Callable paint_callback = () -> {
+        repaint();
+        return null;
+    };
+
     // Move camera smoothly using moving law defined in Animator
     private Timer animation_timer = null;
     private void moveCameraSmooth(GraphicNode n) {
-        // If there is already a timer running, then stop timer
-        if(animation_timer != null && animation_timer.isRunning())
-            animation_timer.stop();
-
-        // Create a new timer with Animator ActionListener
-        animation_timer = new Timer(16, new Animator(camera.getPosition(), camera.lookAt(n)) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Move using step function in Animator
-                camera.move(step(camera.getPosition()));
-                repaint();
-
-                // When final_position is reached (with 5px error) stop moving
-                if(camera.getPosition().subtract(this.final_position).getMagnitude() < 5){
-                    ((Timer) e.getSource()).stop();
-                }
-            }
-        });
-        animation_timer.start();
+        camera.position.animate(camera.lookAt(n), 10, true, paint_callback);
     }
 
     private GraphicNode selectedNode(){
@@ -220,7 +208,7 @@ public class View extends JPanel implements MouseWheelListener, KeyListener{
         for(GraphicNode e : nodes){
             // if paintNode returns true, repaint() needed
             // if e is selected, highlight
-            if(e.paintNode(camera, g2, selectedNode() == e)){
+            if(e.paintNode(camera, g2, selectedNode() == e, paint_callback)){
                 repaint();
             }
         }

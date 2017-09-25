@@ -16,7 +16,7 @@ public class Main {
     }
 
     private static void GUI(View view){
-        JFrame frame = new JFrame("Appunti");
+        JFrame frame = new JFrame("GudNotes");
         frame.setSize(1280, 720);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 

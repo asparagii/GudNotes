@@ -4,15 +4,16 @@ import java.awt.event.ActionListener;
 public abstract class Animator implements ActionListener {
     Vector2 final_position;
     double initialDistance;
+    double speed;
 
-    Animator(Vector2 start_position, Vector2 final_position){
+    Animator(Vector2 start_position, Vector2 final_position, double speed){
         this.final_position = final_position;
         initialDistance = final_position.subtract(start_position).getMagnitude();
+        this.speed = speed;
     }
 
     // returns the vector to be added to the object now moving
     Vector2 step(Vector2 current_position){
-        // TODO Add easy-ease
         Vector2 distance = final_position.subtract(current_position);
         Vector2 ret = distance.getDirection();
         double step_length = speed(distance.getMagnitude() / initialDistance);
@@ -28,7 +29,7 @@ public abstract class Animator implements ActionListener {
 
         // Return Gaussian to ease
         // Max velocity based on initialDistance, so the movement lasts exactly the same for every distance
-        return Gaussian(normalized_x, initialDistance / 10, 0.1);
+        return Gaussian(normalized_x, initialDistance * speed, 0.1);
     }
 
     // Gaussian function with peak 'height' and variance 'var'

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 class NodeContent {
     private Vector2 size;
@@ -88,13 +89,16 @@ class NodeContent {
         size = new_size;
     }
 
+    Vector2 getSize(){ return size; }
+
     private void drawCursor(Graphics2D g, Vector2 position){
         g.setStroke(new BasicStroke(1));
         Vector2 cursor_position = position.add(new Vector2(border_size + g.getFontMetrics().stringWidth(text_buffer.substring(0, cursor)), 3 + line_cursor * g.getFontMetrics().getHeight()));
         g.drawLine((int) cursor_position.x(), (int) cursor_position.y(), (int) cursor_position.x(), (int) cursor_position.y() + g.getFontMetrics().getHeight());
     }
 
-    boolean print(Graphics2D g, Vector2 position){
+    boolean print(Graphics2D g, Vector2 position, Callable everyFrame){
+        boolean resized = false;
         if(text != null) {
             int i = 0;
 
@@ -102,14 +106,20 @@ class NodeContent {
 
             for(String line : text) {
                 // If resize is needed
-                if(g.getFontMetrics().stringWidth(line) > (size.x() - border_size)){
-                    // Return true (will trigger resize and redraw)
-                    return true;
-                }
                 g.drawString(line, (int) position.x() + border_size, (int) position.y() + g.getFontMetrics().getHeight() * (i + 1));
+
+                if(g.getFontMetrics().stringWidth(line) > (size.x() - border_size)){
+                    size.animate(new Vector2(g.getFontMetrics().stringWidth(line) + border_size + 40, size.y()), 5, false, everyFrame);
+                }
+
                 i++;
             }
         }
-        return false;
+
+        // If content is resizing
+        if(size.animation_timer != null)
+            resized = size.animation_timer.isRunning();
+
+        return resized;
     }
 }

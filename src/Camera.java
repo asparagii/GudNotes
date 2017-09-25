@@ -1,6 +1,6 @@
 // This class provides a basic camera
 public class Camera {
-    private Vector2 position;
+    Vector2 position;
     private float zoom;
 
     public Camera(int x, int y, float startZoom){
