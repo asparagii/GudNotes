@@ -1,5 +1,8 @@
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.geom.CubicCurve2D;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 public class GraphicNode extends Node{
@@ -19,31 +22,38 @@ public class GraphicNode extends Node{
     }
 
 
-    // Set position near the edge of the (only) parent
+    // Set position near the edge of the (first) parent
     // To be called only when node has one parent
     public void setAutoPosition(int minSpace){
-        try {
-            GraphicNode father = (GraphicNode) getParents().get(0);
-            position.setX(father.getPosition().x() + father.getSize().x() + minSpace);
+        if(getParents().isEmpty())
+            return;
 
-            int sum = 0;
-            for (Object i : father.getChildren()) {
-                GraphicNode e = (GraphicNode) i;
-                sum += e.getSize().y() + minSpace;
-            }
-            position.setY(father.getPosition().y() + sum - getSize().y() - minSpace);
+        GraphicNode father = (GraphicNode) getParents().get(0);
+        position.setX(father.getPosition().x() + father.getSize().x() + minSpace);
 
-        } catch (ArrayIndexOutOfBoundsException e){
-            position.setPosition(0, 0);
+
+        // Adds up the size.y of every brother before this
+        int sum = 0;
+        List<GraphicNode> brothers = father.getChildren();
+        int my_index = brothers.indexOf(this);
+        for (int i = 0; i < my_index; i++) {
+            sum += brothers.get(i).getSize().y() + minSpace;
         }
+
+        position.setY(father.getPosition().y() + sum);
+
     }
 
     // Set automatic position for every child and grandchild and (...)
     public void setAutoPositionFamily(int minSpace){
-        for (Object i : getChildren()) {
-            GraphicNode to_be_changed = (GraphicNode) i;
-            to_be_changed.setAutoPositionFamily(minSpace);
-            to_be_changed.setAutoPosition(minSpace);
+        System.out.println(this.title);
+        setAutoPosition(minSpace);
+
+        if(!getChildren().isEmpty()) {
+            for (Object i : getChildren()) {
+                GraphicNode to_be_changed = (GraphicNode) i;
+                to_be_changed.setAutoPositionFamily(minSpace);
+            }
         }
     }
 
@@ -64,7 +74,7 @@ public class GraphicNode extends Node{
     }
 
     // If returns true, need repaint
-    boolean paintNode(Camera camera, Graphics2D g, boolean highlight, Callable everyFrame){
+    void paintNode(Camera camera, Graphics2D g, boolean highlight, Callable repaint_callback){
         // If highlight is true node will be painted with strokeWeight 2
         if(highlight){
             g.setStroke(new BasicStroke(2));
@@ -79,7 +89,7 @@ public class GraphicNode extends Node{
 
         // Border size sets margins to draw text
         // If content is resizing, resize accordingly
-        if(content.print(g, rel_pos, everyFrame)){
+        if(content.print(g, rel_pos, repaint_callback)){
             size = content.getSize();
             setAutoPositionFamily(20);
         }
@@ -91,7 +101,6 @@ public class GraphicNode extends Node{
             Vector2 end_line = tmp.relativePosition(camera);
             paintArc(g, start_line, end_line);
         }
-        return false;
     }
 
     void appendChar(char s){

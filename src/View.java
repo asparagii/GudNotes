@@ -124,7 +124,7 @@ public class View extends JPanel implements MouseWheelListener, KeyListener{
         GraphicNode new_entry = new GraphicNode(title, 80, 100);
 
         new_entry.addParent(nodes.get(cursor));
-        selectedNode().addChild(new_entry);
+        nodes.get(cursor).addChild(new_entry);
 
         new_entry.setAutoPosition(20);
 
@@ -206,11 +206,8 @@ public class View extends JPanel implements MouseWheelListener, KeyListener{
         g2.scale(camera.getZoom(), camera.getZoom());
 
         for(GraphicNode e : nodes){
-            // if paintNode returns true, repaint() needed
             // if e is selected, highlight
-            if(e.paintNode(camera, g2, selectedNode() == e, paint_callback)){
-                repaint();
-            }
+            e.paintNode(camera, g2, selectedNode() == e, paint_callback);
         }
     }
 

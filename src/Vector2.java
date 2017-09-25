@@ -22,7 +22,6 @@ class Vector2{
     // If override is true, if the vector was animating, the animation will reset,
     // If override is false, the new animation will not be accepted.
     void animate(Vector2 end_position, int duration, boolean override, Callable everyFrame){
-        System.out.println(this);
         // if there is already an animation running and !override
         if(animation_timer != null){
             if(animation_timer.isRunning()){
