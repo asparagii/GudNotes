@@ -2,6 +2,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.CubicCurve2D;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -10,6 +11,7 @@ public class GraphicNode extends Node{
     private String title;
     private Vector2 size;
     private Vector2 position;
+    private Rectangle2D box;
     private NodeContent content;
 
     GraphicNode(String title, int height, int width){
@@ -17,9 +19,11 @@ public class GraphicNode extends Node{
         this.title = title;
         position = new Vector2(0, 0);
         size = new Vector2(width, height);
-
+        box = new Rectangle2D.Double(0, 0, width, height);
         content = new NodeContent(width, height, 5);
     }
+
+    Rectangle2D getDragBox(){ return box; }
 
 
     // Set position near the edge of the (first) parent
@@ -42,11 +46,12 @@ public class GraphicNode extends Node{
 
         position.setY(father.getPosition().y() + sum);
 
+        box.setRect(position.y(), position.y(), size.x(), size.y());
+
     }
 
     // Set automatic position for every child and grandchild and (...)
     public void setAutoPositionFamily(int minSpace){
-        System.out.println(this.title);
         setAutoPosition(minSpace);
 
         if(!getChildren().isEmpty()) {
@@ -59,6 +64,7 @@ public class GraphicNode extends Node{
 
     void setPosition(int x, int y){
         position.setPosition(x, y);
+        box.setRect(position.y(), position.y(), size.x(), size.y());
     }
 
     Vector2 getPosition(){
@@ -91,6 +97,7 @@ public class GraphicNode extends Node{
         // If content is resizing, resize accordingly
         if(content.print(g, rel_pos, repaint_callback)){
             size = content.getSize();
+            box.setRect(position.y(), position.y(), size.x(), size.y());
             setAutoPositionFamily(20);
         }
 

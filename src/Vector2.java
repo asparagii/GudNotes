@@ -18,6 +18,10 @@ class Vector2{
         this.y = y;
     }
 
+    void print(){
+        System.out.println("x: " + x + ", y: " + y);
+    }
+
     // Starts animation of vector, ending in 'end_position', with 'duration' in ms.
     // If override is true, if the vector was animating, the animation will reset,
     // If override is false, the new animation will not be accepted.

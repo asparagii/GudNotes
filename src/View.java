@@ -6,7 +6,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
-public class View extends JPanel implements MouseWheelListener, KeyListener{
+public class View extends JPanel implements MouseWheelListener, KeyListener, MouseListener, MouseMotionListener{
     private ArrayList<GraphicNode> nodes;
     private Camera camera;
     private int cursor;
@@ -244,6 +244,90 @@ public class View extends JPanel implements MouseWheelListener, KeyListener{
 
     @Override
     public void keyReleased(KeyEvent e) {
+
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    Vector2 mousePositionTransform(MouseEvent e){
+        Vector2 pos = new Vector2(e.getX(), e.getY());
+        return pos.add(camera.getPosition());
+    }
+
+    private GraphicNode moving;
+    private Vector2 previous_node_position;
+    private Vector2 previous_mouse_position;
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+        Vector2 mouse_relative_position = mousePositionTransform(e);
+
+        // If mouse Left + ctrl
+        if((e.getModifiersEx() & (InputEvent.BUTTON1_DOWN_MASK | InputEvent.CTRL_DOWN_MASK)) == (InputEvent.BUTTON1_DOWN_MASK | InputEvent.CTRL_DOWN_MASK)){
+            // If mouse is clicking a node
+            for(GraphicNode i : nodes){
+                if(i.getDragBox().contains(mouse_relative_position.x(), mouse_relative_position.y())){
+                    // Store previous position and start moving
+                    previous_node_position = i.getPosition();
+                    moving = i;
+                    return;
+                }
+            }
+        }
+
+        // If mouse Right is clicked while moving node
+        if((e.getModifiersEx() & InputEvent.BUTTON2_DOWN_MASK) == InputEvent.BUTTON2_DOWN_MASK){
+            // reset
+            if(moving != null){
+                moving.setPosition((int) previous_node_position.x(),  (int) previous_node_position.y());
+                moving = null;
+            }
+
+
+        }
+    }
+
+
+
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        moving = null;
+        previous_mouse_position = null;
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        Vector2 mouse_position = new Vector2(e.getX(), e.getY());
+
+
+        if(previous_mouse_position != null) {
+            if (moving != null) {
+                Vector2 delta = mouse_position.subtract(previous_mouse_position);
+                Vector2 new_node_position = moving.getPosition().add(delta);
+                moving.setPosition((int) new_node_position.x(), (int) new_node_position.y());
+            }
+        }
+        previous_mouse_position = mouse_position;
+        repaint();
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
 
     }
 }

@@ -31,6 +31,10 @@ class Workbench extends View {
 
         // Keyboard input
         addKeyListener(this);
+        // Mouse input
+        addMouseListener(this);
+        addMouseMotionListener(this);
+
         // Zoom with ctrl + mouseWheel
         addMouseWheelListener(this);
         // --- Set input map ---
