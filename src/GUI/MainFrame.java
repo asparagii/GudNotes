@@ -9,16 +9,8 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(1280, 720);
 
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
-
-        setLocationRelativeTo(null);
-        setLayout(null);
-
-        Node xd = new Node(20, 20);
-        add(xd);
+        Viewport viewport = new Viewport();
+        View view = new View(viewport);
+        getContentPane().add(view);
     }
 }
